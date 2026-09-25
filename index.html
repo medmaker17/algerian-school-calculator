@@ -1,972 +1,1216 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="حاسبة المعدل المدرسي لسنوات التعليم المتوسط في الجزائر من الأولى إلى الرابعة متوسط." />
+  <title>حاسبة المعدل المدرسي - التعليم المتوسط الجزائري</title>
 
-    <title>حاسبة المعدل المدرسي - التعليم المتوسط الجزائري</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #142033;
+      --muted: #68778d;
+      --border: #dfe6ef;
+      --primary: #175ddc;
+      --primary-dark: #0e46ad;
+      --success: #11865b;
+      --danger: #c93535;
+      --warning: #a86b00;
+      --shadow: 0 10px 30px rgba(29, 52, 84, .08);
+      --radius: 18px;
+    }
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    * {
+      box-sizing: border-box;
+    }
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #eef4ff 0, var(--bg) 280px);
+      color: var(--text);
+      font-family: Tahoma, Arial, sans-serif;
+      line-height: 1.6;
+    }
 
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-        input[type="number"] {
-            direction: ltr;
-        }
-    </style>
+    .container {
+      width: min(1180px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 45px;
+    }
+
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.45rem, 3vw, 2rem);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(220px, 320px) 1fr;
+      gap: 14px;
+      align-items: end;
+      margin-top: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    select,
+    .score-input,
+    .coef-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    select:focus,
+    .score-input:focus,
+    .coef-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(23, 93, 220, .12);
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: .92rem;
+      background: #f7f9fc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1.12rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #edf1f6;
+      padding: 10px 9px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f7f9fc;
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+
+    td.subject {
+      text-align: right;
+      font-weight: 700;
+      min-width: 230px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 400;
+      display: block;
+    }
+
+    .score-input {
+      width: 84px;
+      text-align: center;
+      padding: 8px 7px;
+    }
+
+    .coef-input {
+      width: 68px;
+      text-align: center;
+      padding: 8px 6px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 86px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: .78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.done {
+      background: #e8f7f0;
+      color: var(--success);
+    }
+
+    .status.off {
+      background: #eef1f5;
+      color: #667487;
+    }
+
+    .status.partial {
+      background: #fff4df;
+      color: var(--warning);
+    }
+
+    .avg-cell {
+      font-weight: 800;
+    }
+
+    .points-cell {
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 15px 18px 18px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 17px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .08s, filter .15s;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      filter: brightness(.95);
+    }
+
+    .btn.secondary {
+      background: #eaf0fb;
+      color: #1f4e9f;
+    }
+
+    .btn.danger {
+      background: #fdecec;
+      color: var(--danger);
+    }
+
+    .results {
+      padding: 0 18px 18px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .summary-box {
+      border: 1px solid var(--border);
+      background: #fbfcfe;
+      border-radius: 15px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .summary-box .value {
+      font-size: 1.35rem;
+      font-weight: 900;
+      margin-top: 4px;
+    }
+
+    .final-box {
+      border: 2px solid rgba(23, 93, 220, .18);
+      background: #f4f8ff;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .final-box .label {
+      color: #48607f;
+    }
+
+    .final-box .value {
+      font-size: clamp(2rem, 7vw, 3.4rem);
+      font-weight: 950;
+      color: var(--primary-dark);
+      line-height: 1.1;
+    }
+
+    .source {
+      color: var(--muted);
+      font-size: .86rem;
+      padding: 0 18px 20px;
+    }
+
+    .source a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .source a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 760px) {
+      .container {
+        width: min(100% - 14px, 1180px);
+        padding-top: 10px;
+      }
+
+      .hero {
+        padding: 17px;
+        border-radius: 18px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .card-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
-<body class="bg-slate-950 min-h-screen text-slate-100 py-8 px-3">
+<body>
 
-<div class="max-w-5xl mx-auto">
+<main class="container">
 
-    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl">
+  <section class="hero">
+    <h1>حاسبة المعدل المدرسي — التعليم المتوسط الجزائري</h1>
 
-        <!-- العنوان -->
-        <div class="text-center mb-8">
-            <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">
-                حاسبة المعدل الفصلي
-            </h1>
+    <p>
+      من الأولى متوسط إلى الرابعة متوسط، مع معاملات قابلة للمراجعة،
+      وفروض 1 و2، والتقويم، والاختبار، ونتيجة تفصيلية.
+    </p>
 
-            <p class="text-slate-400 text-sm">
-                التعليم المتوسط الجزائري
-            </p>
+    <div class="controls">
 
-            <p class="text-xs text-indigo-400 mt-2">
-                الموسم الدراسي 2026 / 2027
-            </p>
-        </div>
+      <div class="field">
+        <label for="gradeSelect">اختر السنة الدراسية</label>
 
+        <select id="gradeSelect">
+          <option value="">— اختر السنة —</option>
+          <option value="1">السنة الأولى متوسط</option>
+          <option value="2">السنة الثانية متوسط</option>
+          <option value="3">السنة الثالثة متوسط</option>
+          <option value="4">السنة الرابعة متوسط</option>
+        </select>
+      </div>
 
-        <!-- اختيار السنة -->
-        <div class="mb-6 bg-slate-950/70 p-4 rounded-2xl border border-slate-700">
+      <div class="note">
+        العلامات من <strong>0 إلى 20</strong>.
+        المادة التي لا توجد لها أي علامة لا تدخل في المعدل العام.
+        إذا كان للمادة فرض واحد فقط، اترك «فرض 2» فارغًا.
+      </div>
 
-            <label class="block text-indigo-400 font-bold mb-2">
-                اختر السنة الدراسية
-            </label>
-
-            <select
-                id="schoolYear"
-                onchange="loadSubjects()"
-                class="w-full bg-slate-800 text-white p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500">
-
-                <option value="1am">الأولى متوسط</option>
-                <option value="2am">الثانية متوسط</option>
-                <option value="3am">الثالثة متوسط</option>
-                <option value="4am">الرابعة متوسط</option>
-
-            </select>
-
-        </div>
+    </div>
+  </section>
 
 
-        <!-- تنبيه -->
-        <div class="bg-blue-950/40 border border-blue-800 rounded-xl p-4 mb-6 text-sm text-blue-200">
+  <section class="card" id="calculatorCard" hidden>
 
-            <strong>طريقة الحساب:</strong>
+    <div class="card-head">
+      <h2 id="yearTitle">المواد</h2>
+      <span class="note" id="yearNote"></span>
+    </div>
 
-            <br>
+    <div class="table-wrap">
 
-            المادة ذات فرض واحد:
-            <br>
+      <table>
 
-            <span class="text-blue-300">
-                ((التقويم + الفرض) ÷ 2 + الاختبار × 2) ÷ 3
-            </span>
+        <thead>
+          <tr>
+            <th>المادة</th>
+            <th>التقويم</th>
+            <th>فرض 1</th>
+            <th>فرض 2</th>
+            <th>الاختبار</th>
+            <th>المعامل</th>
+            <th>معدل المادة</th>
+            <th>النقاط بالمعامل</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
 
-            <br><br>
+        <tbody id="subjectsBody"></tbody>
 
-            المادة ذات فرضين:
-            <br>
-
-            <span class="text-blue-300">
-                ((التقويم + الفرض 1 + الفرض 2) ÷ 3 + الاختبار × 2) ÷ 3
-            </span>
-
-        </div>
-
-
-        <!-- المواد -->
-        <div id="subjectsContainer" class="space-y-4"></div>
-
-
-        <!-- زر الحساب -->
-        <button
-            type="button"
-            onclick="calculateResult()"
-            class="w-full mt-6 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-4 rounded-xl transition-all shadow-lg">
-
-            احسب المعدل النهائي
-
-        </button>
-
-
-        <!-- النتيجة -->
-        <div
-            id="resultCard"
-            class="mt-8 hidden bg-emerald-950/40 border border-emerald-600 rounded-2xl p-6">
-
-            <div class="text-center">
-
-                <h2 class="text-emerald-400 font-bold text-lg">
-                    المعدل الفصلي
-                </h2>
-
-                <div
-                    id="resultValue"
-                    class="text-5xl font-extrabold text-emerald-300 my-3">
-
-                    0.00
-
-                </div>
-
-                <p class="text-slate-400 text-sm">
-                    من 20
-                </p>
-
-            </div>
-
-
-            <!-- تفاصيل الحساب -->
-            <div class="mt-8 overflow-x-auto">
-
-                <table class="w-full text-sm text-right">
-
-                    <thead class="bg-slate-800">
-
-                        <tr>
-
-                            <th class="p-3">المادة</th>
-                            <th class="p-3">معدل المادة</th>
-                            <th class="p-3">المعامل</th>
-                            <th class="p-3">النقاط</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="detailsBody"></tbody>
-
-                    <tfoot class="bg-slate-800 font-bold">
-
-                        <tr>
-
-                            <td class="p-3">
-                                المجموع
-                            </td>
-
-                            <td></td>
-
-                            <td
-                                id="totalWeights"
-                                class="p-3">
-                                0
-                            </td>
-
-                            <td
-                                id="totalPoints"
-                                class="p-3">
-                                0
-                            </td>
-
-                        </tr>
-
-                    </tfoot>
-
-                </table>
-
-            </div>
-
-        </div>
+      </table>
 
     </div>
 
+    <div class="actions">
 
-    <!-- المصدر -->
-    <div class="text-center text-xs text-slate-500 mt-5 leading-6">
+      <button type="button" class="btn primary" id="calculateBtn">
+        🧮 إعادة الحساب
+      </button>
 
-        المعاملات مبنية على جدول الموسم الدراسي 2026/2027.
-        <br>
+      <button type="button" class="btn secondary" id="clearScoresBtn">
+        مسح العلامات فقط
+      </button>
 
-        يرجى مطابقة المواد والمعاملات مع كشف النقاط الخاص بالمؤسسة عند الحاجة.
+      <button type="button" class="btn danger" id="resetAllBtn">
+        إعادة ضبط السنة
+      </button>
 
     </div>
 
-</div>
+  </section>
+
+
+  <section class="card" id="resultsCard" hidden>
+
+    <div class="card-head">
+      <h2>النتيجة التفصيلية</h2>
+      <span class="note" id="resultMessage"></span>
+    </div>
+
+    <div class="results">
+
+      <div class="summary">
+
+        <div class="summary-box">
+          <div class="label">مجموع المعاملات المحتسبة</div>
+          <div class="value" id="totalCoef">0</div>
+        </div>
+
+        <div class="summary-box">
+          <div class="label">مجموع النقاط بالمعامل</div>
+          <div class="value" id="totalPoints">0.00</div>
+        </div>
+
+        <div class="summary-box">
+          <div class="label">عدد المواد المحتسبة</div>
+          <div class="value" id="activeSubjects">0</div>
+        </div>
+
+      </div>
+
+
+      <div class="final-box">
+
+        <div class="label">المعدل العام</div>
+
+        <div class="value" id="generalAverage">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>المادة</th>
+              <th>متوسط التقويم والفروض</th>
+              <th>الاختبار</th>
+              <th>معدل المادة</th>
+              <th>المعامل</th>
+              <th>النقاط</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+
+          <tbody id="resultsBody"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <div class="source">
+
+      <strong>مرجع المعاملات:</strong>
+      المراسلة رقم 470/و ت/م ع ت/2026 المؤرخة في
+      19 سبتمبر 2026، كما نُشرت نسخة منها، مع تأكيد وزارة التربية
+      الوطنية رسميًا دخول الترتيبات الجديدة للتعليم المتوسط حيز التنفيذ
+      في الموسم 2026-2027 وتعزيز معامل اللغة الإنجليزية.
+
+      <br><br>
+
+      <a
+        href="https://www.education.gov.dz/"
+        target="_blank"
+        rel="noopener noreferrer">
+        الموقع الرسمي لوزارة التربية الوطنية الجزائرية
+      </a>
+
+    </div>
+
+  </section>
+
+</main>
 
 
 <script>
 
 /*
-===========================================================
-المعاملات - التعليم المتوسط 2026 / 2027
-===========================================================
+==========================================================
+حاسبة المعدل المدرسي - التعليم المتوسط الجزائري
+==========================================================
 
-المصدر:
-مراسلة رقم 470/و ت/م ع ت/2026
-بتاريخ 19 سبتمبر 2026
+ملاحظات:
+
+1. العلامات من 0 إلى 20.
+2. فرض 2 اختياري.
+3. المادة التي لا توجد لها علامات لا تدخل في المعدل العام.
+4. المعامل قابل للتعديل.
+5. يتم حفظ العلامات تلقائيًا في المتصفح.
+6. التاريخ والجغرافيا مادة واحدة في الحاسبة.
+==========================================================
 */
 
-const curriculums = {
 
-    "1am": [
+const CURRICULUM = {
 
-        {
-            name: "اللغة العربية",
-            weight: 2,
-            tests: 1
-        },
+  1: {
 
-        {
-            name: "اللغة الأمازيغية",
-            weight: 2,
-            tests: 1,
-            optional: true
-        },
+    title: "السنة الأولى متوسط",
 
-        {
-            name: "اللغة الفرنسية",
-            weight: 1,
-            tests: 1
-        },
+    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
 
-        {
-            name: "اللغة الإنجليزية",
-            weight: 1,
-            tests: 1
-        },
+    subjects: [
 
-        {
-            name: "الرياضيات",
-            weight: 2,
-            tests: 1
-        },
+      ["اللغة العربية", 2],
 
-        {
-            name: "علوم الطبيعة والحياة",
-            weight: 1,
-            tests: 1
-        },
+      ["اللغة الأمازيغية", 2],
 
-        {
-            name: "العلوم الفيزيائية والتكنولوجيا",
-            weight: 1,
-            tests: 1
-        },
+      ["اللغة الفرنسية", 1],
 
-        {
-            name: "التاريخ والجغرافيا",
-            weight: 2,
-            tests: 1
-        },
+      ["اللغة الإنجليزية", 1],
 
-        {
-            name: "التربية الإسلامية",
-            weight: 1,
-            tests: 1
-        },
+      ["الرياضيات", 2],
 
-        {
-            name: "التربية المدنية",
-            weight: 1,
-            tests: 1
-        },
+      ["علوم الطبيعة والحياة", 1],
 
-        {
-            name: "التربية التشكيلية أو الموسيقية",
-            weight: 1,
-            tests: 1
-        },
+      ["العلوم الفيزيائية والتكنولوجيا", 1],
 
-        {
-            name: "التربية البدنية والرياضية",
-            weight: 1,
-            tests: 1
-        },
+      ["التاريخ والجغرافيا", 2],
 
-        {
-            name: "المعلوماتية",
-            weight: 1,
-            tests: 1
-        }
+      ["التربية الإسلامية", 1],
 
-    ],
+      ["التربية المدنية", 1],
 
+      ["التربية التشكيلية أو التربية الموسيقية", 1],
 
-    "2am": [
+      ["التربية البدنية والرياضية", 1],
 
-        {
-            name: "اللغة العربية",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "اللغة الأمازيغية",
-            weight: 2,
-            tests: 1,
-            optional: true
-        },
-
-        {
-            name: "اللغة الفرنسية",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "اللغة الإنجليزية",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "الرياضيات",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "علوم الطبيعة والحياة",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "العلوم الفيزيائية والتكنولوجيا",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "التاريخ والجغرافيا",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "التربية الإسلامية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية المدنية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية التشكيلية أو الموسيقية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية البدنية والرياضية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "المعلوماتية",
-            weight: 1,
-            tests: 1
-        }
-
-    ],
-
-
-    "3am": [
-
-        {
-            name: "اللغة العربية",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "اللغة الأمازيغية",
-            weight: 2,
-            tests: 1,
-            optional: true
-        },
-
-        {
-            name: "اللغة الفرنسية",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "اللغة الإنجليزية",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "الرياضيات",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "علوم الطبيعة والحياة",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "العلوم الفيزيائية والتكنولوجيا",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "التاريخ والجغرافيا",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "التربية الإسلامية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية المدنية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية التشكيلية أو الموسيقية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية البدنية والرياضية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "المعلوماتية",
-            weight: 1,
-            tests: 1
-        }
-
-    ],
-
-
-    "4am": [
-
-        {
-            name: "اللغة العربية",
-            weight: 5,
-            tests: 1
-        },
-
-        {
-            name: "اللغة الأمازيغية",
-            weight: 2,
-            tests: 1,
-            optional: true
-        },
-
-        {
-            name: "اللغة الفرنسية",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "اللغة الإنجليزية",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "الرياضيات",
-            weight: 4,
-            tests: 1
-        },
-
-        {
-            name: "علوم الطبيعة والحياة",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "العلوم الفيزيائية والتكنولوجيا",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "التاريخ والجغرافيا",
-            weight: 3,
-            tests: 1
-        },
-
-        {
-            name: "التربية الإسلامية",
-            weight: 2,
-            tests: 1
-        },
-
-        {
-            name: "التربية المدنية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية التشكيلية أو الموسيقية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "التربية البدنية والرياضية",
-            weight: 1,
-            tests: 1
-        },
-
-        {
-            name: "المعلوماتية",
-            weight: 1,
-            tests: 1
-        }
+      ["المعلوماتية", 1]
 
     ]
+
+  },
+
+
+  2: {
+
+    title: "السنة الثانية متوسط",
+
+    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
+
+    subjects: [
+
+      ["اللغة العربية", 3],
+
+      ["اللغة الأمازيغية", 2],
+
+      ["اللغة الفرنسية", 2],
+
+      ["اللغة الإنجليزية", 2],
+
+      ["الرياضيات", 3],
+
+      ["علوم الطبيعة والحياة", 2],
+
+      ["العلوم الفيزيائية والتكنولوجيا", 2],
+
+      ["التاريخ والجغرافيا", 2],
+
+      ["التربية الإسلامية", 1],
+
+      ["التربية المدنية", 1],
+
+      ["التربية التشكيلية أو التربية الموسيقية", 1],
+
+      ["التربية البدنية والرياضية", 1],
+
+      ["المعلوماتية", 1]
+
+    ]
+
+  },
+
+
+  3: {
+
+    title: "السنة الثالثة متوسط",
+
+    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
+
+    subjects: [
+
+      ["اللغة العربية", 3],
+
+      ["اللغة الأمازيغية", 2],
+
+      ["اللغة الفرنسية", 2],
+
+      ["اللغة الإنجليزية", 2],
+
+      ["الرياضيات", 3],
+
+      ["علوم الطبيعة والحياة", 2],
+
+      ["العلوم الفيزيائية والتكنولوجيا", 2],
+
+      ["التاريخ والجغرافيا", 2],
+
+      ["التربية الإسلامية", 1],
+
+      ["التربية المدنية", 1],
+
+      ["التربية التشكيلية أو التربية الموسيقية", 1],
+
+      ["التربية البدنية والرياضية", 1],
+
+      ["المعلوماتية", 1]
+
+    ]
+
+  },
+
+
+  4: {
+
+    title: "السنة الرابعة متوسط",
+
+    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
+
+    subjects: [
+
+      ["اللغة العربية", 5],
+
+      ["اللغة الأمازيغية", 2],
+
+      ["اللغة الفرنسية", 3],
+
+      ["اللغة الإنجليزية", 3],
+
+      ["الرياضيات", 4],
+
+      ["علوم الطبيعة والحياة", 2],
+
+      ["العلوم الفيزيائية والتكنولوجيا", 2],
+
+      ["التاريخ والجغرافيا", 3],
+
+      ["التربية الإسلامية", 2],
+
+      ["التربية المدنية", 1],
+
+      ["التربية التشكيلية أو التربية الموسيقية", 1],
+
+      ["التربية البدنية والرياضية", 1],
+
+      ["المعلوماتية", 1]
+
+    ]
+
+  }
 
 };
 
 
-/*
-===========================================================
-التحقق من العلامة
-===========================================================
-*/
+/* عناصر الصفحة */
 
-function validGrade(value) {
+const gradeSelect =
+  document.getElementById("gradeSelect");
 
-    if (value === "") {
-        return null;
-    }
+const calculatorCard =
+  document.getElementById("calculatorCard");
 
-    const number = parseFloat(value);
+const resultsCard =
+  document.getElementById("resultsCard");
 
-    if (isNaN(number) || number < 0 || number > 20) {
-        return null;
-    }
+const subjectsBody =
+  document.getElementById("subjectsBody");
 
-    return number;
-}
+const resultsBody =
+  document.getElementById("resultsBody");
 
+const yearTitle =
+  document.getElementById("yearTitle");
 
-/*
-===========================================================
-تحميل المواد
-===========================================================
-*/
+const yearNote =
+  document.getElementById("yearNote");
 
-function loadSubjects() {
+const resultMessage =
+  document.getElementById("resultMessage");
 
-    const yearKey =
-        document.getElementById("schoolYear").value;
+const totalCoefEl =
+  document.getElementById("totalCoef");
 
-    const subjects =
-        curriculums[yearKey];
+const totalPointsEl =
+  document.getElementById("totalPoints");
 
-    const container =
-        document.getElementById("subjectsContainer");
+const activeSubjectsEl =
+  document.getElementById("activeSubjects");
 
-    container.innerHTML = "";
+const generalAverageEl =
+  document.getElementById("generalAverage");
 
 
-    subjects.forEach((subject, index) => {
-
-        container.innerHTML += `
-
-            <div
-                class="bg-slate-950/60
-                       border border-slate-700
-                       rounded-2xl
-                       p-4">
-
-                <div
-                    class="flex flex-col sm:flex-row
-                           sm:items-center
-                           sm:justify-between
-                           gap-3 mb-4">
-
-                    <div>
-
-                        <h3 class="font-bold text-indigo-300">
-                            ${subject.name}
-                        </h3>
-
-                        <span class="text-xs text-slate-500">
-                            المعامل: ${subject.weight}
-                        </span>
-
-                    </div>
+let currentYear = "";
+let currentRows = [];
 
 
-                    <label
-                        class="flex items-center gap-2
-                               text-xs text-slate-400">
+/* التخزين المحلي */
 
-                        <input
-                            type="checkbox"
-                            id="active_${index}"
-                            checked
-                            onchange="toggleSubject(${index})"
-                            class="w-4 h-4 accent-indigo-600">
+function storageKey(year) {
 
-                        احتساب المادة
-
-                    </label>
-
-                </div>
-
-
-                <div
-                    id="inputs_${index}"
-                    class="grid grid-cols-1
-                           sm:grid-cols-2
-                           lg:grid-cols-4 gap-3">
-
-
-                    <div>
-
-                        <label class="block text-xs text-slate-400 mb-1">
-                            التقويم المستمر
-                        </label>
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            step="0.01"
-                            id="taqwem_${index}"
-                            placeholder="0 - 20"
-                            class="w-full bg-slate-800
-                                   p-3 rounded-xl
-                                   border border-slate-700
-                                   text-white">
-
-                    </div>
-
-
-                    <div>
-
-                        <label class="block text-xs text-slate-400 mb-1">
-                            الفرض 1
-                        </label>
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            step="0.01"
-                            id="fard1_${index}"
-                            placeholder="0 - 20"
-                            class="w-full bg-slate-800
-                                   p-3 rounded-xl
-                                   border border-slate-700
-                                   text-white">
-
-                    </div>
-
-
-                    <div>
-
-                        <label class="block text-xs text-slate-400 mb-1">
-                            الفرض 2
-                        </label>
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            step="0.01"
-                            id="fard2_${index}"
-                            placeholder="اختياري"
-                            class="w-full bg-slate-800
-                                   p-3 rounded-xl
-                                   border border-slate-700
-                                   text-white">
-
-                    </div>
-
-
-                    <div>
-
-                        <label class="block text-xs text-slate-400 mb-1">
-                            الاختبار
-                        </label>
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            step="0.01"
-                            id="grade_${index}"
-                            placeholder="0 - 20"
-                            class="w-full bg-slate-800
-                                   p-3 rounded-xl
-                                   border border-slate-700
-                                   text-white">
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        `;
-
-    });
+  return dz_middle_average_${year}_2026_2027;
 
 }
 
 
-/*
-===========================================================
-تعطيل / تفعيل المادة
-===========================================================
-*/
+function getStoredData(year) {
 
-function toggleSubject(index) {
+  try {
 
-    const checkbox =
-        document.getElementById(active_${index});
-
-    const inputs =
-        document.getElementById(inputs_${index});
-
-    inputs.style.opacity =
-        checkbox.checked ? "1" : "0.35";
-
-}
-
-
-/*
-===========================================================
-حساب معدل المادة
-===========================================================
-*/
-
-function calculateSubjectAverage(
-    taqwem,
-    fard1,
-    fard2,
-    test
-) {
-
-    /*
-    إذا وُجد فرضان:
-
-    معدل الفروض =
-    (فرض1 + فرض2) / 2
-
-    ثم:
-
-    ((التقويم + معدل الفروض) / 2
-    + الاختبار × 2) / 3
-    */
-
-    let averageFards;
-
-
-    if (fard2 !== null) {
-
-        averageFards =
-            (fard1 + fard2) / 2;
-
-    } else {
-
-        averageFards =
-            fard1;
-
-    }
-
-
-    return (
-        (
-            (taqwem + averageFards) / 2
-            +
-            (test * 2)
-        ) / 3
+    return JSON.parse(
+      localStorage.getItem(storageKey(year)) || "{}"
     );
 
+  } catch (_) {
+
+    return {};
+
+  }
+
 }
 
 
-/*
-===========================================================
-الحساب النهائي
-===========================================================
-*/
+function saveData() {
 
-function calculateResult() {
+  if (!currentYear) return;
 
-    const yearKey =
-        document.getElementById("schoolYear").value;
+  const data = {};
 
-    const subjects =
-        curriculums[yearKey];
+  currentRows.forEach((row, index) => {
 
+    data[index] = {
 
-    let totalPoints = 0;
-    let totalWeights = 0;
+      assessment: row.assessment.value,
 
-    let details = [];
+      f1: row.f1.value,
 
+      f2: row.f2.value,
 
-    subjects.forEach((subject, index) => {
+      exam: row.exam.value,
 
-        const active =
-            document.getElementById(active_${index}).checked;
+      coef: row.coef.value
 
+    };
 
-        if (!active) {
-            return;
-        }
+  });
 
+  localStorage.setItem(
+    storageKey(currentYear),
+    JSON.stringify(data)
+  );
 
-        const taqwem =
-            validGrade(
-                document.getElementById(taqwem_${index}).value
-            );
-
-        const fard1 =
-            validGrade(
-                document.getElementById(fard1_${index}).value
-            );
-
-        const fard2 =
-            validGrade(
-                document.getElementById(fard2_${index}).value
-            );
-
-        const test =
-            validGrade(
-                document.getElementById(grade_${index}).value
-            );
+}
 
 
-        /*
-        لا نحسب المادة إذا كانت العلامات الأساسية ناقصة
-        */
+/* تنسيق الأرقام */
 
-        if (
-            taqwem === null ||
-            fard1 === null ||
-            test === null
-        ) {
+function formatNumber(value, digits = 2) {
 
-            return;
+  return Number.isFinite(value)
+    ? value.toFixed(digits)
+    : "—";
 
-        }
+}
 
 
-        const subjectAverage =
-            calculateSubjectAverage(
-                taqwem,
-                fard1,
-                fard2,
-                test
-            );
+/* قراءة العلامة */
+
+function parseScore(input) {
+
+  const raw = input.value.trim();
+
+  if (raw === "") {
+    return null;
+  }
+
+  const value = Number(raw);
+
+  return Number.isFinite(value)
+    ? value
+    : null;
+
+}
 
 
-        const weightedPoints =
-            subjectAverage * subject.weight;
+/* منع العلامة من تجاوز 20 */
+
+function clampScoreInput(input) {
+
+  const raw = input.value.trim();
+
+  if (raw === "") {
+    return;
+  }
+
+  let value = Number(raw);
+
+  if (!Number.isFinite(value)) {
+
+    input.value = "";
+
+    return;
+
+  }
+
+  if (value < 0) {
+    value = 0;
+  }
+
+  if (value > 20) {
+    value = 20;
+  }
+
+  input.value = String(value);
+
+  input.setCustomValidity("");
+
+}
 
 
-        totalPoints += weightedPoints;
+/* إنشاء حقل العلامة */
 
-        totalWeights += subject.weight;
+function makeScoreInput(value = "") {
+
+  const input =
+    document.createElement("input");
+
+  input.type = "number";
+
+  input.min = "0";
+
+  input.max = "20";
+
+  input.step = "0.25";
+
+  input.inputMode = "decimal";
+
+  input.className = "score-input";
+
+  input.placeholder = "—";
+
+  input.value = value ?? "";
+
+  input.addEventListener("input", () => {
+
+    clampScoreInput(input);
+
+    saveData();
+
+  });
+
+  input.addEventListener("blur", () => {
+
+    clampScoreInput(input);
+
+  });
+
+  return input;
+
+}
 
 
-        details.push({
+/* إنشاء حقل المعامل */
 
-            name: subject.name,
+function makeCoefInput(value = 0) {
 
-            average: subjectAverage,
+  const input =
+    document.createElement("input");
 
-            weight: subject.weight,
+  input.type = "number";
 
-            points: weightedPoints
+  input.min = "0";
 
-        });
+  input.max = "20";
 
-    });
+  input.step = "1";
 
+  input.inputMode = "numeric";
 
-    /*
-    لا توجد مواد مكتملة
-    */
+  input.className = "coef-input";
 
-    if (totalWeights === 0) {
+  input.value = value;
 
-        alert(
-            "أدخل علامات مادة واحدة على الأقل: التقويم، الفرض، والاختبار."
-        );
+  input.title =
+    "يمكن مراجعة وتعديل المعامل قبل الحساب";
 
-        return;
+  input.addEventListener("input", () => {
 
+    let n = Number(input.value);
+
+    if (!Number.isFinite(n) || n < 0) {
+      n = 0;
     }
 
+    if (n > 20) {
+      n = 20;
+    }
 
-    const finalAverage =
-        totalPoints / totalWeights;
+    input.value = String(n);
 
+    saveData();
 
-    /*
-    عرض النتيجة
-    */
+  });
 
-    document.getElementById("resultValue")
-        .textContent =
-        finalAverage.toFixed(2);
+  return input;
 
-
-    document.getElementById("totalWeights")
-        .textContent =
-        totalWeights;
+}
 
 
-    document.getElementById("totalPoints")
-        .textContent =
-        totalPoints.toFixed(2);
+/* متوسط التقويم والفروض */
+
+function getContinuousAverage(row) {
+
+  const scores = [
+
+    row.assessment,
+
+    row.f1,
+
+    row.f2
+
+  ]
+
+  .map(parseScore)
+
+  .filter(value => value !== null);
 
 
-    /*
-    جدول التفاصيل
-    */
+  if (scores.length === 0) {
 
-    const detailsBody =
-        document.getElementById("detailsBody");
+    return null;
 
-    detailsBody.innerHTML = "";
+  }
 
 
-    details.forEach(item => {
+  return scores.reduce(
+    (a, b) => a + b,
+    0
+  ) / scores.length;
 
-        detailsBody.innerHTML += `
+}
 
-            <tr class="border-b border-slate-800">
 
-                <td c
+/* حساب معدل المادة */
+
+function calculateRow(row) {
+
+  const continuous =
+    getContinuousAverage(row);
+
+  const exam =
+    parseScore(row.exam);
+
+  const coefficient =
+    Number(row.coef.value);
+
+
+  if (
+    continuous === null ||
+    exam === null ||
+    !Number.isFinite(coefficient) ||
+    coefficient <= 0
+  ) {
+
+    return {
+
+      continuous,
+
+      exam,
+
+      coefficient,
+
+      average: null,
+
+      points: null,
+
+      complete:
+        continuous !== null ||
+        exam !== null
+
+    };
+
+  }
+
+
+  /*
+    الصيغة:
+
+    معدل المادة =
+    (متوسط التقويم والفروض + الاختبار × 2) ÷ 3
+  */
+
+  const average =
+    (continuous + (exam * 2)) / 3;
+
+
+  return {
+
+    continuous,
+
+    exam,
+
+    coefficient,
+
+    average,
+
+    points:
+      average * coefficient,
+
+    complete: true
+
+  };
+
+}
+
+
+/* إنشاء جدول المواد */
+
+function renderSubjects(year) {
+
+  const cfg =
+    CURRICULUM[year];
+
+  const stored =
+    getStoredData(year);
+
+
+  currentRows = [];
+
+  subjectsBody.innerHTML = "";
+
+
+  yearTitle.textContent =
+    cfg.title;
+
+  yearNote.textContent =
+    cfg.note;
+
+
+  cfg.subjects.forEach(
+    ([name, defaultCoef], index) => {
+
+      const tr =
+        document.createElement("tr");
+
+
+      const tdName =
+        document.createElement("td");
+
+      tdName.className =
+        "subject";
+
+
+      let extra = "";
+
+
+      if (name.includes("الأمازيغية")) {
+
+        extra =
+          '<span class="small-note">' +
+          "تُترك فارغة إذا لم تكن مدروسة" +
+          "</span>";
+
+      }
+
+
+      if (name === "التاريخ والجغرافيا") {
+
+        extra +=
+          '<span class="small-note">' +
+          "المادة ذات معامل مشترك" +
+          "</span>";
+
+      }
+
+
+      tdName.innerHTML =
+        ${escapeHtml(name)}${extra};
+
+
+      const tdAssessment =
+        document.createElement("td");
+
+      const tdF1 =
+        document.createElement("td");
+
+      const tdF2 =
+        document.createElement("td");
+
+      const tdExam =
+        document.createElement("td");
+
+      const tdCoef =
+        document.createElement("td");
+
+      const tdAvg =
+        document.createElement("td");
+
+      const tdPoints =
+        document.createElement("td");
+
+      const tdStatus =
+        document.createElement("td");
+
+
+      const saved =
+        stored[index] || {};
+
+
+      const assessment =
+        makeScoreInput(
+          saved.assessment ?? ""
+        );
+
+
+      const f1 =
+        makeScoreInput(
+          saved.f1 ?? ""
+        );
+
+
+      const f2 =
+        makeScoreInput(
+          saved.f2 ?? ""
+        );
+
+
+      const exam =
+        makeScoreInput(
+          saved.exam ?? ""
+        );
+
+
+      const coef =
+        makeCoefInput(
+          saved.coef ?? defaultCoef
+        );
+
+
+      tdAssessment.appendChild(
+        assessment
+      );
+
+      tdF1.appendChild(f1);
+
+      tdF2.appendChild(f2);
+
+      tdExam.appendChild(exam);
+
+      tdCoef.appendChild(coef);
+
+
+      tdAvg.textContent = "—";
+
+      tdPoints.textContent = "—";
+
+
+      tr.append(
+
+        t
