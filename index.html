@@ -1,10 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="حاسبة المعدل المدرسي لسنوات التعليم المتوسط في الجزائر من الأولى إلى الرابعة متوسط." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="حاسبة المعدل المدرسي للتعليم المتوسط في الجزائر من الأولى إلى الرابعة متوسط."
+  >
+
   <title>حاسبة المعدل المدرسي - التعليم المتوسط الجزائري</title>
 
   <style>
@@ -19,20 +23,28 @@
       --success: #11865b;
       --danger: #c93535;
       --warning: #a86b00;
-      --shadow: 0 10px 30px rgba(29, 52, 84, .08);
-      --radius: 18px;
+      --shadow: 0 8px 24px rgba(29, 52, 84, 0.07);
+      --radius: 16px;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      background: linear-gradient(180deg, #eef4ff 0, var(--bg) 280px);
+      background: linear-gradient(
+        180deg,
+        #eef4ff 0,
+        var(--bg) 240px
+      );
       color: var(--text);
       font-family: Tahoma, Arial, sans-serif;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     button,
@@ -42,42 +54,47 @@
     }
 
     .container {
-      width: min(1180px, calc(100% - 24px));
-      margin: 0 auto;
-      padding: 20px 0 45px;
+      width: min(1180px, calc(100% - 20px));
+      margin: auto;
+      padding: 12px 0 40px;
     }
+
+    /* =========================
+       HEADER
+    ========================= */
 
     .hero {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 24px;
+      border-radius: 20px;
       box-shadow: var(--shadow);
-      padding: 24px;
-      margin-bottom: 18px;
+      padding: 18px;
+      margin-bottom: 12px;
     }
 
     .hero h1 {
-      margin: 0 0 8px;
-      font-size: clamp(1.45rem, 3vw, 2rem);
+      margin: 0 0 4px;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
     }
 
     .hero p {
       margin: 0;
       color: var(--muted);
+      font-size: 0.92rem;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: minmax(220px, 320px) 1fr;
-      gap: 14px;
+      grid-template-columns: minmax(220px, 300px) 1fr;
+      gap: 10px;
       align-items: end;
-      margin-top: 18px;
+      margin-top: 12px;
     }
 
     .field label {
       display: block;
-      margin-bottom: 7px;
-      font-weight: 700;
+      margin-bottom: 5px;
+      font-weight: 800;
     }
 
     select,
@@ -85,36 +102,39 @@
     .coef-input {
       width: 100%;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px;
       background: #fff;
       color: var(--text);
-      padding: 11px 12px;
+      padding: 9px 10px;
       outline: none;
-      transition: border-color .15s, box-shadow .15s;
     }
 
     select:focus,
     .score-input:focus,
     .coef-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(23, 93, 220, .12);
+      box-shadow: 0 0 0 3px rgba(23, 93, 220, 0.1);
     }
 
     .note {
       color: var(--muted);
-      font-size: .92rem;
+      font-size: 0.85rem;
       background: #f7f9fc;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: 8px 10px;
     }
+
+    /* =========================
+       CARDS
+    ========================= */
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      margin-bottom: 18px;
+      margin-bottom: 12px;
       overflow: hidden;
     }
 
@@ -122,15 +142,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 16px 18px;
+      gap: 10px;
+      padding: 12px 15px;
       border-bottom: 1px solid var(--border);
     }
 
     .card-head h2 {
       margin: 0;
-      font-size: 1.12rem;
+      font-size: 1.05rem;
     }
+
+    /* =========================
+       TABLE
+    ========================= */
 
     .table-wrap {
       overflow-x: auto;
@@ -139,57 +163,66 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 980px;
+      min-width: 930px;
     }
 
     th,
     td {
       border-bottom: 1px solid #edf1f6;
-      padding: 10px 9px;
+      padding: 8px;
       text-align: center;
       vertical-align: middle;
     }
 
     th {
       background: #f7f9fc;
-      font-size: .9rem;
+      font-size: 0.84rem;
       white-space: nowrap;
     }
 
     td.subject {
       text-align: right;
       font-weight: 700;
-      min-width: 230px;
+      min-width: 215px;
     }
 
     .small-note {
-      color: var(--muted);
-      font-size: .8rem;
-      font-weight: 400;
       display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 400;
     }
 
     .score-input {
-      width: 84px;
+      width: 76px;
       text-align: center;
-      padding: 8px 7px;
+      padding: 7px;
     }
 
     .coef-input {
-      width: 68px;
+      width: 58px;
       text-align: center;
-      padding: 8px 6px;
+      padding: 7px;
     }
+
+    .avg-cell,
+    .points-cell {
+      font-weight: 800;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
 
     .status {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 86px;
+      min-width: 78px;
       border-radius: 999px;
-      padding: 4px 8px;
-      font-size: .78rem;
-      font-weight: 700;
+      padding: 3px 7px;
+      font-size: 0.74rem;
+      font-weight: 800;
       white-space: nowrap;
     }
 
@@ -208,41 +241,38 @@
       color: var(--warning);
     }
 
-    .avg-cell {
-      font-weight: 800;
-    }
-
-    .points-cell {
-      font-weight: 700;
-    }
+    /* =========================
+       BUTTONS
+    ========================= */
 
     .actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      padding: 15px 18px 18px;
+      gap: 8px;
+      padding: 12px 15px 15px;
     }
 
     .btn {
       border: 0;
-      border-radius: 12px;
-      padding: 11px 17px;
+      border-radius: 10px;
+      padding: 9px 15px;
       cursor: pointer;
       font-weight: 800;
-      transition: transform .08s, filter .15s;
+      transition: 0.15s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.97);
     }
 
     .btn:active {
-      transform: translateY(1px);
+      transform: translateY(0);
     }
 
     .btn.primary {
       background: var(--primary);
       color: #fff;
-    }
-
-    .btn.primary:hover {
-      filter: brightness(.95);
     }
 
     .btn.secondary {
@@ -255,43 +285,46 @@
       color: var(--danger);
     }
 
+    /* =========================
+       RESULTS
+    ========================= */
+
     .results {
-      padding: 0 18px 18px;
+      padding: 0 15px 15px;
     }
 
     .summary {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .summary-box {
       border: 1px solid var(--border);
       background: #fbfcfe;
-      border-radius: 15px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 10px;
       text-align: center;
     }
 
     .summary-box .label {
       color: var(--muted);
-      font-size: .86rem;
+      font-size: 0.8rem;
     }
 
     .summary-box .value {
-      font-size: 1.35rem;
+      font-size: 1.2rem;
       font-weight: 900;
-      margin-top: 4px;
     }
 
     .final-box {
-      border: 2px solid rgba(23, 93, 220, .18);
+      border: 2px solid rgba(23, 93, 220, 0.16);
       background: #f4f8ff;
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 13px;
+      padding: 12px;
       text-align: center;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .final-box .label {
@@ -299,7 +332,7 @@
     }
 
     .final-box .value {
-      font-size: clamp(2rem, 7vw, 3.4rem);
+      font-size: clamp(1.8rem, 6vw, 3rem);
       font-weight: 950;
       color: var(--primary-dark);
       line-height: 1.1;
@@ -307,37 +340,28 @@
 
     .source {
       color: var(--muted);
-      font-size: .86rem;
-      padding: 0 18px 20px;
+      font-size: 0.78rem;
+      padding: 0 15px 15px;
     }
 
-    .source a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .source a:hover {
-      text-decoration: underline;
-    }
+    /* =========================
+       MOBILE
+    ========================= */
 
     @media (max-width: 760px) {
+
       .container {
-        width: min(100% - 14px, 1180px);
-        padding-top: 10px;
+        width: calc(100% - 10px);
+        padding-top: 6px;
       }
 
       .hero {
-        padding: 17px;
-        border-radius: 18px;
+        padding: 14px;
+        border-radius: 16px;
       }
 
       .controls {
         grid-template-columns: 1fr;
-      }
-
-      .card-head {
-        align-items: flex-start;
-        flex-direction: column;
       }
 
       .summary {
@@ -351,6 +375,11 @@
       .btn {
         width: 100%;
       }
+
+      .card-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -359,61 +388,122 @@
 
 <main class="container">
 
+  <!-- =========================
+       HEADER
+  ========================== -->
+
   <section class="hero">
-    <h1>حاسبة المعدل المدرسي — التعليم المتوسط الجزائري</h1>
+
+    <h1>
+      حاسبة المعدل المدرسي — التعليم المتوسط الجزائري
+    </h1>
 
     <p>
-      من الأولى متوسط إلى الرابعة متوسط، مع معاملات قابلة للمراجعة،
-      وفروض 1 و2، والتقويم، والاختبار، ونتيجة تفصيلية.
+      اختر السنة الدراسية وستظهر المواد مباشرة أسفل الاختيار.
     </p>
 
     <div class="controls">
 
       <div class="field">
-        <label for="gradeSelect">اختر السنة الدراسية</label>
+
+        <label for="gradeSelect">
+          اختر السنة الدراسية
+        </label>
 
         <select id="gradeSelect">
-          <option value="">— اختر السنة —</option>
-          <option value="1">السنة الأولى متوسط</option>
-          <option value="2">السنة الثانية متوسط</option>
-          <option value="3">السنة الثالثة متوسط</option>
-          <option value="4">السنة الرابعة متوسط</option>
+
+          <option value="">
+            — اختر السنة —
+          </option>
+
+          <option value="1">
+            السنة الأولى متوسط
+          </option>
+
+          <option value="2">
+            السنة الثانية متوسط
+          </option>
+
+          <option value="3">
+            السنة الثالثة متوسط
+          </option>
+
+          <option value="4">
+            السنة الرابعة متوسط
+          </option>
+
         </select>
+
       </div>
 
       <div class="note">
-        العلامات من <strong>0 إلى 20</strong>.
-        المادة التي لا توجد لها أي علامة لا تدخل في المعدل العام.
-        إذا كان للمادة فرض واحد فقط، اترك «فرض 2» فارغًا.
+
+        <strong>العلامات من 0 إلى 20.</strong>
+
+        المادة التي لا توجد لها أي علامة
+        لا تدخل في المعدل العام.
+
+        فرض 2 اختياري.
+
       </div>
 
     </div>
+
   </section>
 
 
-  <section class="card" id="calculatorCard" hidden>
+  <!-- =========================
+       CALCULATOR
+  ========================== -->
+
+  <section
+    class="card"
+    id="calculatorCard"
+    hidden
+  >
 
     <div class="card-head">
-      <h2 id="yearTitle">المواد</h2>
-      <span class="note" id="yearNote"></span>
+
+      <h2 id="yearTitle">
+        المواد
+      </h2>
+
+      <span
+        class="note"
+        id="yearNote"
+      ></span>
+
     </div>
+
 
     <div class="table-wrap">
 
       <table>
 
         <thead>
+
           <tr>
+
             <th>المادة</th>
+
             <th>التقويم</th>
+
             <th>فرض 1</th>
+
             <th>فرض 2</th>
+
             <th>الاختبار</th>
+
             <th>المعامل</th>
+
             <th>معدل المادة</th>
+
             <th>النقاط بالمعامل</th>
+
             <th>الحالة</th>
+
           </tr>
+
         </thead>
 
         <tbody id="subjectsBody"></tbody>
@@ -422,17 +512,30 @@
 
     </div>
 
+
     <div class="actions">
 
-      <button type="button" class="btn primary" id="calculateBtn">
+      <button
+        type="button"
+        class="btn primary"
+        id="calculateBtn"
+      >
         🧮 إعادة الحساب
       </button>
 
-      <button type="button" class="btn secondary" id="clearScoresBtn">
+      <button
+        type="button"
+        class="btn secondary"
+        id="clearScoresBtn"
+      >
         مسح العلامات فقط
       </button>
 
-      <button type="button" class="btn danger" id="resetAllBtn">
+      <button
+        type="button"
+        class="btn danger"
+        id="resetAllBtn"
+      >
         إعادة ضبط السنة
       </button>
 
@@ -441,30 +544,79 @@
   </section>
 
 
-  <section class="card" id="resultsCard" hidden>
+  <!-- =========================
+       RESULTS
+  ========================== -->
+
+  <section
+    class="card"
+    id="resultsCard"
+    hidden
+  >
 
     <div class="card-head">
-      <h2>النتيجة التفصيلية</h2>
-      <span class="note" id="resultMessage"></span>
+
+      <h2>
+        النتيجة التفصيلية
+      </h2>
+
+      <span
+        class="note"
+        id="resultMessage"
+      ></span>
+
     </div>
+
 
     <div class="results">
 
       <div class="summary">
 
         <div class="summary-box">
-          <div class="label">مجموع المعاملات المحتسبة</div>
-          <div class="value" id="totalCoef">0</div>
+
+          <div class="label">
+            مجموع المعاملات المحتسبة
+          </div>
+
+          <div
+            class="value"
+            id="totalCoef"
+          >
+            0
+          </div>
+
         </div>
 
-        <div class="summary-box">
-          <div class="label">مجموع النقاط بالمعامل</div>
-          <div class="value" id="totalPoints">0.00</div>
-        </div>
 
         <div class="summary-box">
-          <div class="label">عدد المواد المحتسبة</div>
-          <div class="value" id="activeSubjects">0</div>
+
+          <div class="label">
+            مجموع النقاط بالمعامل
+          </div>
+
+          <div
+            class="value"
+            id="totalPoints"
+          >
+            0.00
+          </div>
+
+        </div>
+
+
+        <div class="summary-box">
+
+          <div class="label">
+            عدد المواد المحتسبة
+          </div>
+
+          <div
+            class="value"
+            id="activeSubjects"
+          >
+            0
+          </div>
+
         </div>
 
       </div>
@@ -472,9 +624,14 @@
 
       <div class="final-box">
 
-        <div class="label">المعدل العام</div>
+        <div class="label">
+          المعدل العام
+        </div>
 
-        <div class="value" id="generalAverage">
+        <div
+          class="value"
+          id="generalAverage"
+        >
           —
         </div>
 
@@ -486,15 +643,37 @@
         <table>
 
           <thead>
+
             <tr>
+
               <th>المادة</th>
-              <th>متوسط التقويم والفروض</th>
-              <th>الاختبار</th>
-              <th>معدل المادة</th>
-              <th>المعامل</th>
-              <th>النقاط</th>
-              <th>الحالة</th>
+
+              <th>
+                متوسط التقويم والفروض
+              </th>
+
+              <th>
+                الاختبار
+              </th>
+
+              <th>
+                معدل المادة
+              </th>
+
+              <th>
+                المعامل
+              </th>
+
+              <th>
+                النقاط
+              </th>
+
+              <th>
+                الحالة
+              </th>
+
             </tr>
+
           </thead>
 
           <tbody id="resultsBody"></tbody>
@@ -505,22 +684,12 @@
 
     </div>
 
+
     <div class="source">
 
-      <strong>مرجع المعاملات:</strong>
-      المراسلة رقم 470/و ت/م ع ت/2026 المؤرخة في
-      19 سبتمبر 2026، كما نُشرت نسخة منها، مع تأكيد وزارة التربية
-      الوطنية رسميًا دخول الترتيبات الجديدة للتعليم المتوسط حيز التنفيذ
-      في الموسم 2026-2027 وتعزيز معامل اللغة الإنجليزية.
-
-      <br><br>
-
-      <a
-        href="https://www.education.gov.dz/"
-        target="_blank"
-        rel="noopener noreferrer">
-        الموقع الرسمي لوزارة التربية الوطنية الجزائرية
-      </a>
+      المعاملات الافتراضية قابلة للتعديل
+      من الجدول. عند وجود تعليمة رسمية جديدة،
+      يمكن تعديل المعاملات مباشرة.
 
     </div>
 
@@ -531,30 +700,15 @@
 
 <script>
 
-/*
-==========================================================
-حاسبة المعدل المدرسي - التعليم المتوسط الجزائري
-==========================================================
-
-ملاحظات:
-
-1. العلامات من 0 إلى 20.
-2. فرض 2 اختياري.
-3. المادة التي لا توجد لها علامات لا تدخل في المعدل العام.
-4. المعامل قابل للتعديل.
-5. يتم حفظ العلامات تلقائيًا في المتصفح.
-6. التاريخ والجغرافيا مادة واحدة في الحاسبة.
-==========================================================
-*/
-
+/* =====================================================
+   بيانات المواد
+===================================================== */
 
 const CURRICULUM = {
 
   1: {
 
     title: "السنة الأولى متوسط",
-
-    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
 
     subjects: [
 
@@ -593,8 +747,6 @@ const CURRICULUM = {
 
     title: "السنة الثانية متوسط",
 
-    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
-
     subjects: [
 
       ["اللغة العربية", 3],
@@ -631,8 +783,6 @@ const CURRICULUM = {
   3: {
 
     title: "السنة الثالثة متوسط",
-
-    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
 
     subjects: [
 
@@ -671,8 +821,6 @@ const CURRICULUM = {
 
     title: "السنة الرابعة متوسط",
 
-    note: "المعاملات المرجعية للموسم الدراسي 2026-2027",
-
     subjects: [
 
       ["اللغة العربية", 5],
@@ -708,7 +856,9 @@ const CURRICULUM = {
 };
 
 
-/* عناصر الصفحة */
+/* =====================================================
+   عناصر الصفحة
+===================================================== */
 
 const gradeSelect =
   document.getElementById("gradeSelect");
@@ -748,14 +898,17 @@ const generalAverageEl =
 
 
 let currentYear = "";
+
 let currentRows = [];
 
 
-/* التخزين المحلي */
+/* =====================================================
+   Local Storage
+===================================================== */
 
 function storageKey(year) {
 
-  return dz_middle_average_${year}_2026_2027;
+  return `dz_middle_average_${year}_2026_2027`;
 
 }
 
@@ -765,10 +918,12 @@ function getStoredData(year) {
   try {
 
     return JSON.parse(
-      localStorage.getItem(storageKey(year)) || "{}"
+      localStorage.getItem(
+        storageKey(year)
+      ) || "{}"
     );
 
-  } catch (_) {
+  } catch (error) {
 
     return {};
 
@@ -779,27 +934,36 @@ function getStoredData(year) {
 
 function saveData() {
 
-  if (!currentYear) return;
+  if (!currentYear) {
+    return;
+  }
 
   const data = {};
 
-  currentRows.forEach((row, index) => {
+  currentRows.forEach(
+    (row, index) => {
 
-    data[index] = {
+      data[index] = {
 
-      assessment: row.assessment.value,
+        assessment:
+          row.assessment.value,
 
-      f1: row.f1.value,
+        f1:
+          row.f1.value,
 
-      f2: row.f2.value,
+        f2:
+          row.f2.value,
 
-      exam: row.exam.value,
+        exam:
+          row.exam.value,
 
-      coef: row.coef.value
+        coef:
+          row.coef.value
 
-    };
+      };
 
-  });
+    }
+  );
 
   localStorage.setItem(
     storageKey(currentYear),
@@ -809,9 +973,14 @@ function saveData() {
 }
 
 
-/* تنسيق الأرقام */
+/* =====================================================
+   أدوات مساعدة
+===================================================== */
 
-function formatNumber(value, digits = 2) {
+function formatNumber(
+  value,
+  digits = 2
+) {
 
   return Number.isFinite(value)
     ? value.toFixed(digits)
@@ -820,36 +989,40 @@ function formatNumber(value, digits = 2) {
 }
 
 
-/* قراءة العلامة */
-
 function parseScore(input) {
 
-  const raw = input.value.trim();
+  const raw =
+    input.value.trim();
 
   if (raw === "") {
     return null;
   }
 
-  const value = Number(raw);
+  const value =
+    Number(raw);
 
-  return Number.isFinite(value)
-    ? value
-    : null;
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+
+  return Math.max(
+    0,
+    Math.min(20, value)
+  );
 
 }
 
 
-/* منع العلامة من تجاوز 20 */
-
 function clampScoreInput(input) {
 
-  const raw = input.value.trim();
-
-  if (raw === "") {
+  if (
+    input.value.trim() === ""
+  ) {
     return;
   }
 
-  let value = Number(raw);
+  let value =
+    Number(input.value);
 
   if (!Number.isFinite(value)) {
 
@@ -859,24 +1032,53 @@ function clampScoreInput(input) {
 
   }
 
-  if (value < 0) {
-    value = 0;
-  }
+  value =
+    Math.max(
+      0,
+      Math.min(20, value)
+    );
 
-  if (value > 20) {
-    value = 20;
-  }
-
-  input.value = String(value);
-
-  input.setCustomValidity("");
+  input.value =
+    String(value);
 
 }
 
 
-/* إنشاء حقل العلامة */
+/* =====================================================
+   حماية النصوص
+===================================================== */
 
-function makeScoreInput(value = "") {
+function escapeHtml(value) {
+
+  return String(value).replace(
+    /[&<>"']/g,
+    function (character) {
+
+      const entities = {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      };
+
+      return entities[character];
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   حقل العلامة
+===================================================== */
+
+function makeScoreInput(
+  value = ""
+) {
 
   const input =
     document.createElement("input");
@@ -889,36 +1091,55 @@ function makeScoreInput(value = "") {
 
   input.step = "0.25";
 
-  input.inputMode = "decimal";
+  input.inputMode =
+    "decimal";
 
-  input.className = "score-input";
+  input.className =
+    "score-input";
 
-  input.placeholder = "—";
+  input.placeholder =
+    "—";
 
-  input.value = value ?? "";
+  input.value =
+    value ?? "";
 
-  input.addEventListener("input", () => {
 
-    clampScoreInput(input);
+  input.addEventListener(
+    "input",
+    function () {
 
-    saveData();
+      clampScoreInput(input);
 
-  });
+      saveData();
 
-  input.addEventListener("blur", () => {
+    }
+  );
 
-    clampScoreInput(input);
 
-  });
+  input.addEventListener(
+    "blur",
+    function () {
+
+      clampScoreInput(input);
+
+      saveData();
+
+    }
+  );
+
 
   return input;
 
 }
 
 
-/* إنشاء حقل المعامل */
+/* =====================================================
+   حقل المعامل
+===================================================== */
 
-function makeCoefInput(value = 0) {
+function makeCoefInput(
+  value = 0
+) {
 
   const input =
     document.createElement("input");
@@ -931,39 +1152,55 @@ function makeCoefInput(value = 0) {
 
   input.step = "1";
 
-  input.inputMode = "numeric";
+  input.inputMode =
+    "numeric";
 
-  input.className = "coef-input";
+  input.className =
+    "coef-input";
 
-  input.value = value;
+  input.value =
+    value;
 
-  input.title =
-    "يمكن مراجعة وتعديل المعامل قبل الحساب";
 
-  input.addEventListener("input", () => {
+  input.addEventListener(
+    "input",
+    function () {
 
-    let n = Number(input.value);
+      let number =
+        Number(input.value);
 
-    if (!Number.isFinite(n) || n < 0) {
-      n = 0;
+      if (
+        !Number.isFinite(number) ||
+        number < 0
+      ) {
+
+        number = 0;
+
+      }
+
+      if (number > 20) {
+
+        number = 20;
+
+      }
+
+      input.value =
+        String(number);
+
+      saveData();
+
     }
+  );
 
-    if (n > 20) {
-      n = 20;
-    }
-
-    input.value = String(n);
-
-    saveData();
-
-  });
 
   return input;
 
 }
 
 
-/* متوسط التقويم والفروض */
+/* =====================================================
+   متوسط التقويم والفروض
+===================================================== */
 
 function getContinuousAverage(row) {
 
@@ -977,9 +1214,11 @@ function getContinuousAverage(row) {
 
   ]
 
-  .map(parseScore)
+    .map(parseScore)
 
-  .filter(value => value !== null);
+    .filter(
+      value => value !== null
+    );
 
 
   if (scores.length === 0) {
@@ -989,15 +1228,24 @@ function getContinuousAverage(row) {
   }
 
 
-  return scores.reduce(
-    (a, b) => a + b,
-    0
-  ) / scores.length;
+  const total =
+    scores.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    );
+
+
+  return (
+    total / scores.length
+  );
 
 }
 
 
-/* حساب معدل المادة */
+/* =====================================================
+   حساب معدل المادة
+===================================================== */
 
 function calculateRow(row) {
 
@@ -1040,14 +1288,17 @@ function calculateRow(row) {
 
 
   /*
-    الصيغة:
+    معدل المادة:
 
-    معدل المادة =
-    (متوسط التقويم والفروض + الاختبار × 2) ÷ 3
+    (متوسط التقويم والفروض
+     + الاختبار × 2) ÷ 3
   */
 
   const average =
-    (continuous + (exam * 2)) / 3;
+    (
+      continuous +
+      exam * 2
+    ) / 3;
 
 
   return {
@@ -1070,147 +1321,6 @@ function calculateRow(row) {
 }
 
 
-/* إنشاء جدول المواد */
-
-function renderSubjects(year) {
-
-  const cfg =
-    CURRICULUM[year];
-
-  const stored =
-    getStoredData(year);
-
-
-  currentRows = [];
-
-  subjectsBody.innerHTML = "";
-
-
-  yearTitle.textContent =
-    cfg.title;
-
-  yearNote.textContent =
-    cfg.note;
-
-
-  cfg.subjects.forEach(
-    ([name, defaultCoef], index) => {
-
-      const tr =
-        document.createElement("tr");
-
-
-      const tdName =
-        document.createElement("td");
-
-      tdName.className =
-        "subject";
-
-
-      let extra = "";
-
-
-      if (name.includes("الأمازيغية")) {
-
-        extra =
-          '<span class="small-note">' +
-          "تُترك فارغة إذا لم تكن مدروسة" +
-          "</span>";
-
-      }
-
-
-      if (name === "التاريخ والجغرافيا") {
-
-        extra +=
-          '<span class="small-note">' +
-          "المادة ذات معامل مشترك" +
-          "</span>";
-
-      }
-
-
-      tdName.innerHTML =
-        ${escapeHtml(name)}${extra};
-
-
-      const tdAssessment =
-        document.createElement("td");
-
-      const tdF1 =
-        document.createElement("td");
-
-      const tdF2 =
-        document.createElement("td");
-
-      const tdExam =
-        document.createElement("td");
-
-      const tdCoef =
-        document.createElement("td");
-
-      const tdAvg =
-        document.createElement("td");
-
-      const tdPoints =
-        document.createElement("td");
-
-      const tdStatus =
-        document.createElement("td");
-
-
-      const saved =
-        stored[index] || {};
-
-
-      const assessment =
-        makeScoreInput(
-          saved.assessment ?? ""
-        );
-
-
-      const f1 =
-        makeScoreInput(
-          saved.f1 ?? ""
-        );
-
-
-      const f2 =
-        makeScoreInput(
-          saved.f2 ?? ""
-        );
-
-
-      const exam =
-        makeScoreInput(
-          saved.exam ?? ""
-        );
-
-
-      const coef =
-        makeCoefInput(
-          saved.coef ?? defaultCoef
-        );
-
-
-      tdAssessment.appendChild(
-        assessment
-      );
-
-      tdF1.appendChild(f1);
-
-      tdF2.appendChild(f2);
-
-      tdExam.appendChild(exam);
-
-      tdCoef.appendChild(coef);
-
-
-      tdAvg.textContent = "—";
-
-      tdPoints.textContent = "—";
-
-
-      tr.append(
-
-        t
+/* =====================================================
+   إنشاء جدول المواد
+=======================
