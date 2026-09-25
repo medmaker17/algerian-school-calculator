@@ -1,1 +1,972 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>حاسبة المعدل المدرسي - التعليم المتوسط الجزائري</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        input[type="number"] {
+            direction: ltr;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 min-h-screen text-slate-100 py-8 px-3">
+
+<div class="max-w-5xl mx-auto">
+
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl">
+
+        <!-- العنوان -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">
+                حاسبة المعدل الفصلي
+            </h1>
+
+            <p class="text-slate-400 text-sm">
+                التعليم المتوسط الجزائري
+            </p>
+
+            <p class="text-xs text-indigo-400 mt-2">
+                الموسم الدراسي 2026 / 2027
+            </p>
+        </div>
+
+
+        <!-- اختيار السنة -->
+        <div class="mb-6 bg-slate-950/70 p-4 rounded-2xl border border-slate-700">
+
+            <label class="block text-indigo-400 font-bold mb-2">
+                اختر السنة الدراسية
+            </label>
+
+            <select
+                id="schoolYear"
+                onchange="loadSubjects()"
+                class="w-full bg-slate-800 text-white p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500">
+
+                <option value="1am">الأولى متوسط</option>
+                <option value="2am">الثانية متوسط</option>
+                <option value="3am">الثالثة متوسط</option>
+                <option value="4am">الرابعة متوسط</option>
+
+            </select>
+
+        </div>
+
+
+        <!-- تنبيه -->
+        <div class="bg-blue-950/40 border border-blue-800 rounded-xl p-4 mb-6 text-sm text-blue-200">
+
+            <strong>طريقة الحساب:</strong>
+
+            <br>
+
+            المادة ذات فرض واحد:
+            <br>
+
+            <span class="text-blue-300">
+                ((التقويم + الفرض) ÷ 2 + الاختبار × 2) ÷ 3
+            </span>
+
+            <br><br>
+
+            المادة ذات فرضين:
+            <br>
+
+            <span class="text-blue-300">
+                ((التقويم + الفرض 1 + الفرض 2) ÷ 3 + الاختبار × 2) ÷ 3
+            </span>
+
+        </div>
+
+
+        <!-- المواد -->
+        <div id="subjectsContainer" class="space-y-4"></div>
+
+
+        <!-- زر الحساب -->
+        <button
+            type="button"
+            onclick="calculateResult()"
+            class="w-full mt-6 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-4 rounded-xl transition-all shadow-lg">
+
+            احسب المعدل النهائي
+
+        </button>
+
+
+        <!-- النتيجة -->
+        <div
+            id="resultCard"
+            class="mt-8 hidden bg-emerald-950/40 border border-emerald-600 rounded-2xl p-6">
+
+            <div class="text-center">
+
+                <h2 class="text-emerald-400 font-bold text-lg">
+                    المعدل الفصلي
+                </h2>
+
+                <div
+                    id="resultValue"
+                    class="text-5xl font-extrabold text-emerald-300 my-3">
+
+                    0.00
+
+                </div>
+
+                <p class="text-slate-400 text-sm">
+                    من 20
+                </p>
+
+            </div>
+
+
+            <!-- تفاصيل الحساب -->
+            <div class="mt-8 overflow-x-auto">
+
+                <table class="w-full text-sm text-right">
+
+                    <thead class="bg-slate-800">
+
+                        <tr>
+
+                            <th class="p-3">المادة</th>
+                            <th class="p-3">معدل المادة</th>
+                            <th class="p-3">المعامل</th>
+                            <th class="p-3">النقاط</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="detailsBody"></tbody>
+
+                    <tfoot class="bg-slate-800 font-bold">
+
+                        <tr>
+
+                            <td class="p-3">
+                                المجموع
+                            </td>
+
+                            <td></td>
+
+                            <td
+                                id="totalWeights"
+                                class="p-3">
+                                0
+                            </td>
+
+                            <td
+                                id="totalPoints"
+                                class="p-3">
+                                0
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- المصدر -->
+    <div class="text-center text-xs text-slate-500 mt-5 leading-6">
+
+        المعاملات مبنية على جدول الموسم الدراسي 2026/2027.
+        <br>
+
+        يرجى مطابقة المواد والمعاملات مع كشف النقاط الخاص بالمؤسسة عند الحاجة.
+
+    </div>
+
+</div>
+
+
+<script>
+
+/*
+===========================================================
+المعاملات - التعليم المتوسط 2026 / 2027
+===========================================================
+
+المصدر:
+مراسلة رقم 470/و ت/م ع ت/2026
+بتاريخ 19 سبتمبر 2026
+*/
+
+const curriculums = {
+
+    "1am": [
+
+        {
+            name: "اللغة العربية",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الأمازيغية",
+            weight: 2,
+            tests: 1,
+            optional: true
+        },
+
+        {
+            name: "اللغة الفرنسية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الإنجليزية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "الرياضيات",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "علوم الطبيعة والحياة",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "العلوم الفيزيائية والتكنولوجيا",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التاريخ والجغرافيا",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التربية الإسلامية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية المدنية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية التشكيلية أو الموسيقية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية البدنية والرياضية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "المعلوماتية",
+            weight: 1,
+            tests: 1
+        }
+
+    ],
+
+
+    "2am": [
+
+        {
+            name: "اللغة العربية",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الأمازيغية",
+            weight: 2,
+            tests: 1,
+            optional: true
+        },
+
+        {
+            name: "اللغة الفرنسية",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الإنجليزية",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "الرياضيات",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "علوم الطبيعة والحياة",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "العلوم الفيزيائية والتكنولوجيا",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التاريخ والجغرافيا",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التربية الإسلامية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية المدنية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية التشكيلية أو الموسيقية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية البدنية والرياضية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "المعلوماتية",
+            weight: 1,
+            tests: 1
+        }
+
+    ],
+
+
+    "3am": [
+
+        {
+            name: "اللغة العربية",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الأمازيغية",
+            weight: 2,
+            tests: 1,
+            optional: true
+        },
+
+        {
+            name: "اللغة الفرنسية",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الإنجليزية",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "الرياضيات",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "علوم الطبيعة والحياة",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "العلوم الفيزيائية والتكنولوجيا",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التاريخ والجغرافيا",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التربية الإسلامية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية المدنية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية التشكيلية أو الموسيقية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية البدنية والرياضية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "المعلوماتية",
+            weight: 1,
+            tests: 1
+        }
+
+    ],
+
+
+    "4am": [
+
+        {
+            name: "اللغة العربية",
+            weight: 5,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الأمازيغية",
+            weight: 2,
+            tests: 1,
+            optional: true
+        },
+
+        {
+            name: "اللغة الفرنسية",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "اللغة الإنجليزية",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "الرياضيات",
+            weight: 4,
+            tests: 1
+        },
+
+        {
+            name: "علوم الطبيعة والحياة",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "العلوم الفيزيائية والتكنولوجيا",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التاريخ والجغرافيا",
+            weight: 3,
+            tests: 1
+        },
+
+        {
+            name: "التربية الإسلامية",
+            weight: 2,
+            tests: 1
+        },
+
+        {
+            name: "التربية المدنية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية التشكيلية أو الموسيقية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "التربية البدنية والرياضية",
+            weight: 1,
+            tests: 1
+        },
+
+        {
+            name: "المعلوماتية",
+            weight: 1,
+            tests: 1
+        }
+
+    ]
+
+};
+
+
+/*
+===========================================================
+التحقق من العلامة
+===========================================================
+*/
+
+function validGrade(value) {
+
+    if (value === "") {
+        return null;
+    }
+
+    const number = parseFloat(value);
+
+    if (isNaN(number) || number < 0 || number > 20) {
+        return null;
+    }
+
+    return number;
+}
+
+
+/*
+===========================================================
+تحميل المواد
+===========================================================
+*/
+
+function loadSubjects() {
+
+    const yearKey =
+        document.getElementById("schoolYear").value;
+
+    const subjects =
+        curriculums[yearKey];
+
+    const container =
+        document.getElementById("subjectsContainer");
+
+    container.innerHTML = "";
+
+
+    subjects.forEach((subject, index) => {
+
+        container.innerHTML += `
+
+            <div
+                class="bg-slate-950/60
+                       border border-slate-700
+                       rounded-2xl
+                       p-4">
+
+                <div
+                    class="flex flex-col sm:flex-row
+                           sm:items-center
+                           sm:justify-between
+                           gap-3 mb-4">
+
+                    <div>
+
+                        <h3 class="font-bold text-indigo-300">
+                            ${subject.name}
+                        </h3>
+
+                        <span class="text-xs text-slate-500">
+                            المعامل: ${subject.weight}
+                        </span>
+
+                    </div>
+
+
+                    <label
+                        class="flex items-center gap-2
+                               text-xs text-slate-400">
+
+                        <input
+                            type="checkbox"
+                            id="active_${index}"
+                            checked
+                            onchange="toggleSubject(${index})"
+                            class="w-4 h-4 accent-indigo-600">
+
+                        احتساب المادة
+
+                    </label>
+
+                </div>
+
+
+                <div
+                    id="inputs_${index}"
+                    class="grid grid-cols-1
+                           sm:grid-cols-2
+                           lg:grid-cols-4 gap-3">
+
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-1">
+                            التقويم المستمر
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="0.01"
+                            id="taqwem_${index}"
+                            placeholder="0 - 20"
+                            class="w-full bg-slate-800
+                                   p-3 rounded-xl
+                                   border border-slate-700
+                                   text-white">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-1">
+                            الفرض 1
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="0.01"
+                            id="fard1_${index}"
+                            placeholder="0 - 20"
+                            class="w-full bg-slate-800
+                                   p-3 rounded-xl
+                                   border border-slate-700
+                                   text-white">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-1">
+                            الفرض 2
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="0.01"
+                            id="fard2_${index}"
+                            placeholder="اختياري"
+                            class="w-full bg-slate-800
+                                   p-3 rounded-xl
+                                   border border-slate-700
+                                   text-white">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-xs text-slate-400 mb-1">
+                            الاختبار
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="0.01"
+                            id="grade_${index}"
+                            placeholder="0 - 20"
+                            class="w-full bg-slate-800
+                                   p-3 rounded-xl
+                                   border border-slate-700
+                                   text-white">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/*
+===========================================================
+تعطيل / تفعيل المادة
+===========================================================
+*/
+
+function toggleSubject(index) {
+
+    const checkbox =
+        document.getElementById(active_${index});
+
+    const inputs =
+        document.getElementById(inputs_${index});
+
+    inputs.style.opacity =
+        checkbox.checked ? "1" : "0.35";
+
+}
+
+
+/*
+===========================================================
+حساب معدل المادة
+===========================================================
+*/
+
+function calculateSubjectAverage(
+    taqwem,
+    fard1,
+    fard2,
+    test
+) {
+
+    /*
+    إذا وُجد فرضان:
+
+    معدل الفروض =
+    (فرض1 + فرض2) / 2
+
+    ثم:
+
+    ((التقويم + معدل الفروض) / 2
+    + الاختبار × 2) / 3
+    */
+
+    let averageFards;
+
+
+    if (fard2 !== null) {
+
+        averageFards =
+            (fard1 + fard2) / 2;
+
+    } else {
+
+        averageFards =
+            fard1;
+
+    }
+
+
+    return (
+        (
+            (taqwem + averageFards) / 2
+            +
+            (test * 2)
+        ) / 3
+    );
+
+}
+
+
+/*
+===========================================================
+الحساب النهائي
+===========================================================
+*/
+
+function calculateResult() {
+
+    const yearKey =
+        document.getElementById("schoolYear").value;
+
+    const subjects =
+        curriculums[yearKey];
+
+
+    let totalPoints = 0;
+    let totalWeights = 0;
+
+    let details = [];
+
+
+    subjects.forEach((subject, index) => {
+
+        const active =
+            document.getElementById(active_${index}).checked;
+
+
+        if (!active) {
+            return;
+        }
+
+
+        const taqwem =
+            validGrade(
+                document.getElementById(taqwem_${index}).value
+            );
+
+        const fard1 =
+            validGrade(
+                document.getElementById(fard1_${index}).value
+            );
+
+        const fard2 =
+            validGrade(
+                document.getElementById(fard2_${index}).value
+            );
+
+        const test =
+            validGrade(
+                document.getElementById(grade_${index}).value
+            );
+
+
+        /*
+        لا نحسب المادة إذا كانت العلامات الأساسية ناقصة
+        */
+
+        if (
+            taqwem === null ||
+            fard1 === null ||
+            test === null
+        ) {
+
+            return;
+
+        }
+
+
+        const subjectAverage =
+            calculateSubjectAverage(
+                taqwem,
+                fard1,
+                fard2,
+                test
+            );
+
+
+        const weightedPoints =
+            subjectAverage * subject.weight;
+
+
+        totalPoints += weightedPoints;
+
+        totalWeights += subject.weight;
+
+
+        details.push({
+
+            name: subject.name,
+
+            average: subjectAverage,
+
+            weight: subject.weight,
+
+            points: weightedPoints
+
+        });
+
+    });
+
+
+    /*
+    لا توجد مواد مكتملة
+    */
+
+    if (totalWeights === 0) {
+
+        alert(
+            "أدخل علامات مادة واحدة على الأقل: التقويم، الفرض، والاختبار."
+        );
+
+        return;
+
+    }
+
+
+    const finalAverage =
+        totalPoints / totalWeights;
+
+
+    /*
+    عرض النتيجة
+    */
+
+    document.getElementById("resultValue")
+        .textContent =
+        finalAverage.toFixed(2);
+
+
+    document.getElementById("totalWeights")
+        .textContent =
+        totalWeights;
+
+
+    document.getElementById("totalPoints")
+        .textContent =
+        totalPoints.toFixed(2);
+
+
+    /*
+    جدول التفاصيل
+    */
+
+    const detailsBody =
+        document.getElementById("detailsBody");
+
+    detailsBody.innerHTML = "";
+
+
+    details.forEach(item => {
+
+        detailsBody.innerHTML += `
+
+            <tr class="border-b border-slate-800">
+
+                <td c
