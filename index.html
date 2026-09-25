@@ -1323,3 +1323,605 @@ function calculateRow(row) {
 /* =====================================================
    إنشاء جدول المواد
 =======================
+/* =====================================================
+   إنشاء جدول المواد
+===================================================== */
+
+function renderSubjects(year) {
+  const curriculum = CURRICULUM[year];
+
+  if (!curriculum) {
+    calculatorCard.hidden = true;
+    resultsCard.hidden = true;
+    subjectsBody.innerHTML = "";
+    return;
+  }
+
+  currentYear = String(year);
+
+  const stored = getStoredData(currentYear);
+
+  subjectsBody.innerHTML = "";
+  currentRows = [];
+
+  yearTitle.textContent = curriculum.title;
+  yearNote.textContent =
+    "أدخل العلامات من 0 إلى 20. فرض 2 اختياري.";
+
+  curriculum.subjects.forEach(
+    ([subjectName, defaultCoef], index) => {
+
+      const saved = stored[index] || {};
+
+      const tr = document.createElement("tr");
+
+      const subjectCell =
+        document.createElement("td");
+
+      subjectCell.className = "subject";
+      subjectCell.textContent = subjectName;
+
+      const assessmentCell =
+        document.createElement("td");
+
+      const f1Cell =
+        document.createElement("td");
+
+      const f2Cell =
+        document.createElement("td");
+
+      const examCell =
+        document.createElement("td");
+
+      const coefCell =
+        document.createElement("td");
+
+      const avgCell =
+        document.createElement("td");
+
+      const pointsCell =
+        document.createElement("td");
+
+      const statusCell =
+        document.createElement("td");
+
+
+      const assessment =
+        makeScoreInput(saved.assessment || "");
+
+      const f1 =
+        makeScoreInput(saved.f1 || "");
+
+      const f2 =
+        makeScoreInput(saved.f2 || "");
+
+      const exam =
+        makeScoreInput(saved.exam || "");
+
+      const coef =
+        makeCoefInput(
+          saved.coef !== undefined
+            ? saved.coef
+            : defaultCoef
+        );
+
+
+      assessmentCell.appendChild(assessment);
+      f1Cell.appendChild(f1);
+      f2Cell.appendChild(f2);
+      examCell.appendChild(exam);
+      coefCell.appendChild(coef);
+
+
+      avgCell.className = "avg-cell";
+      pointsCell.className = "points-cell";
+
+
+      const status =
+        document.createElement("span");
+
+      status.className = "status off";
+      status.textContent = "غير محتسبة";
+
+      statusCell.appendChild(status);
+
+
+      tr.appendChild(subjectCell);
+      tr.appendChild(assessmentCell);
+      tr.appendChild(f1Cell);
+      tr.appendChild(f2Cell);
+      tr.appendChild(examCell);
+      tr.appendChild(coefCell);
+      tr.appendChild(avgCell);
+      tr.appendChild(pointsCell);
+      tr.appendChild(statusCell);
+
+      subjectsBody.appendChild(tr);
+
+
+      const row = {
+        tr,
+        subjectName,
+        assessment,
+        f1,
+        f2,
+        exam,
+        coef,
+        avgCell,
+        pointsCell,
+        status
+      };
+
+      currentRows.push(row);
+
+
+      [
+        assessment,
+        f1,
+        f2,
+        exam,
+        coef
+      ].forEach(input => {
+
+        input.addEventListener(
+          "input",
+          function () {
+            updateTable();
+          }
+        );
+
+        input.addEventListener(
+          "change",
+          function () {
+            updateTable();
+          }
+        );
+
+      });
+
+    }
+  );
+
+
+  calculatorCard.hidden = false;
+
+  resultsCard.hidden = false;
+
+  updateTable();
+
+  saveData();
+
+
+  setTimeout(function () {
+
+    calculatorCard.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  }, 50);
+}
+
+
+/* =====================================================
+   تحديث الجدول
+===================================================== */
+
+function updateTable() {
+
+  if (!currentRows.length) {
+    return;
+  }
+
+  let totalCoef = 0;
+  let totalPoints = 0;
+  let activeSubjects = 0;
+
+  resultsBody.innerHTML = "";
+
+
+  currentRows.forEach(row => {
+
+    const result =
+      calculateRow(row);
+
+
+    if (
+      result.average !== null &&
+      result.coefficient > 0
+    ) {
+
+      row.avgCell.textContent =
+        formatNumber(result.average);
+
+      row.pointsCell.textContent =
+        formatNumber(result.points);
+
+
+      row.status.className =
+        "status done";
+
+      row.status.textContent =
+        "محتسبة";
+
+
+      totalCoef +=
+        result.coefficient;
+
+      totalPoints +=
+        result.points;
+
+      activeSubjects++;
+
+
+    } else if (
+      result.continuous !== null ||
+      result.exam !== null
+    ) {
+
+      row.avgCell.textContent = "—";
+
+      row.pointsCell.textContent = "—";
+
+      row.status.className =
+        "status partial";
+
+      row.status.textContent =
+        "غير مكتملة";
+
+
+    } else {
+
+      row.avgCell.textContent = "—";
+
+      row.pointsCell.textContent = "—";
+
+      row.status.className =
+        "status off";
+
+      row.status.textContent =
+        "غير محتسبة";
+
+    }
+
+
+    createResultRow(
+      row,
+      result
+    );
+
+  });
+
+
+  totalCoefEl.textContent =
+    formatNumber(totalCoef, 0);
+
+  totalPointsEl.textContent =
+    formatNumber(totalPoints);
+
+  activeSubjectsEl.textContent =
+    String(activeSubjects);
+
+
+  if (totalCoef > 0) {
+
+    const average =
+      totalPoints / totalCoef;
+
+    generalAverageEl.textContent =
+      formatNumber(average);
+
+    resultMessage.textContent =
+      "تم احتساب المواد المكتملة فقط.";
+
+  } else {
+
+    generalAverageEl.textContent =
+      "—";
+
+    resultMessage.textContent =
+      "أدخل العلامات ثم أكمل الاختبار.";
+
+  }
+
+}
+
+
+/* =====================================================
+   إنشاء صف النتيجة
+===================================================== */
+
+function createResultRow(
+  row,
+  result
+) {
+
+  const tr =
+    document.createElement("tr");
+
+
+  const subject =
+    document.createElement("td");
+
+  subject.className =
+    "subject";
+
+  subject.textContent =
+    row.subjectName;
+
+
+  const continuous =
+    document.createElement("td");
+
+  continuous.textContent =
+    result.continuous !== null
+      ? formatNumber(result.continuous)
+      : "—";
+
+
+  const exam =
+    document.createElement("td");
+
+  exam.textContent =
+    result.exam !== null
+      ? formatNumber(result.exam)
+      : "—";
+
+
+  const average =
+    document.createElement("td");
+
+  average.className =
+    "avg-cell";
+
+  average.textContent =
+    result.average !== null
+      ? formatNumber(result.average)
+      : "—";
+
+
+  const coefficient =
+    document.createElement("td");
+
+  coefficient.textContent =
+    result.coefficient > 0
+      ? formatNumber(result.coefficient, 0)
+      : "—";
+
+
+  const points =
+    document.createElement("td");
+
+  points.className =
+    "points-cell";
+
+  points.textContent =
+    result.points !== null
+      ? formatNumber(result.points)
+      : "—";
+
+
+  const statusCell =
+    document.createElement("td");
+
+  const status =
+    document.createElement("span");
+
+
+  if (
+    result.average !== null &&
+    result.coefficient > 0
+  ) {
+
+    status.className =
+      "status done";
+
+    status.textContent =
+      "محتسبة";
+
+
+  } else if (
+    result.continuous !== null ||
+    result.exam !== null
+  ) {
+
+    status.className =
+      "status partial";
+
+    status.textContent =
+      "غير مكتملة";
+
+
+  } else {
+
+    status.className =
+      "status off";
+
+    status.textContent =
+      "غير محتسبة";
+
+  }
+
+
+  statusCell.appendChild(status);
+
+
+  tr.appendChild(subject);
+  tr.appendChild(continuous);
+  tr.appendChild(exam);
+  tr.appendChild(average);
+  tr.appendChild(coefficient);
+  tr.appendChild(points);
+  tr.appendChild(statusCell);
+
+
+  resultsBody.appendChild(tr);
+
+}
+
+
+/* =====================================================
+   اختيار السنة
+===================================================== */
+
+gradeSelect.addEventListener(
+  "change",
+  function () {
+
+    const year =
+      this.value;
+
+    if (!year) {
+
+      currentYear = "";
+
+      currentRows = [];
+
+      subjectsBody.innerHTML = "";
+
+      resultsBody.innerHTML = "";
+
+      calculatorCard.hidden = true;
+
+      resultsCard.hidden = true;
+
+      return;
+
+    }
+
+    renderSubjects(year);
+
+  }
+);
+
+
+/* =====================================================
+   زر إعادة الحساب
+===================================================== */
+
+document
+  .getElementById("calculateBtn")
+  .addEventListener(
+    "click",
+    function () {
+
+      updateTable();
+
+      saveData();
+
+    }
+  );
+
+
+/* =====================================================
+   مسح العلامات
+===================================================== */
+
+document
+  .getElementById("clearScoresBtn")
+  .addEventListener(
+    "click",
+    function () {
+
+      currentRows.forEach(
+        row => {
+
+          row.assessment.value = "";
+          row.f1.value = "";
+          row.f2.value = "";
+          row.exam.value = "";
+
+        }
+      );
+
+      updateTable();
+
+      saveData();
+
+    }
+  );
+
+
+/* =====================================================
+   إعادة ضبط السنة
+===================================================== */
+
+document
+  .getElementById("resetAllBtn")
+  .addEventListener(
+    "click",
+    function () {
+
+      if (!currentYear) {
+        return;
+      }
+
+      localStorage.removeItem(
+        storageKey(currentYear)
+      );
+
+      gradeSelect.value = "";
+
+      currentYear = "";
+
+      currentRows = [];
+
+      subjectsBody.innerHTML = "";
+
+      resultsBody.innerHTML = "";
+
+      calculatorCard.hidden = true;
+
+      resultsCard.hidden = true;
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+  );
+
+
+/* =====================================================
+   تشغيل أولي
+===================================================== */
+
+(function init() {
+
+  const savedYear =
+    localStorage.getItem(
+      "dz_middle_selected_year"
+    );
+
+  if (
+    savedYear &&
+    CURRICULUM[savedYear]
+  ) {
+
+    gradeSelect.value =
+      savedYear;
+
+    renderSubjects(savedYear);
+
+  }
+
+})();
+
+
+gradeSelect.addEventListener(
+  "change",
+  function () {
+
+    localStorage.setItem(
+      "dz_middle_selected_year",
+      this.value
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
